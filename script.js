@@ -3,7 +3,7 @@
 // Use $.get() and a chain of .then() calls to fetch these URLs one by one. 
 // After each .get() is done, console log "data was fetched!"
 
-var urls = [
+let urls = [
 	'https://dog.ceo/api/breed/beagle/images/random',
   'https://dog.ceo/api/breed/chow/images/random',
   'https://dog.ceo/api/breed/akita/images/random',
@@ -12,15 +12,15 @@ var urls = [
  ];
 
  
- $.get('https://dog.ceo/api/breed/beagle/images/random')
+ $.get(urls[0])
 		.then(function(value){
-	 	return $.get('https://dog.ceo/api/breed/chow/images/random');
+	 	return $.get(urls[1]);
 	 }) .then(function(value){
-	 	return $.get('https://dog.ceo/api/breed/akita/images/random');
+	 	return $.get(urls[2]);
 	 }) .then(function(value){
-	 	return $.get('https://dog.ceo/api/breed/dingo/images/random');
+	 	return $.get(urls[3]);
 	 }) .then(function(value){
-	 	return $.get('https://dog.ceo/api/breed/eskimo/images/random');
+	 	return $.get(urls[4]);
 	 }) .then(function(value){
 	 	console.log('data was fetched!');
 	 });
@@ -31,12 +31,14 @@ var urls = [
 // Use Promise.all() to retreive all of the URLs above. 
 // After it's done, console log "all the data was fetched!"	 
 
-Promise.all([$.get('https://dog.ceo/api/breed/beagle/images/random'), 
-		$.get('https://dog.ceo/api/breed/chow/images/random'),
-		$.get('https://dog.ceo/api/breed/akita/images/random'),
-		$.get('https://dog.ceo/api/breed/dingo/images/random'),
-		$.get('https://dog.ceo/api/breed/eskimo/images/random')]).then(function(value){
- 	console.log('all the data was fetched!');
+let promises = urls.map(url => {
+	return $.get(url);
+});
+
+
+Promise.all(promises)
+	.then(function(responses){
+ 		console.log('all the data was fetched!');
  });
 
 
@@ -48,16 +50,22 @@ Promise.all([$.get('https://dog.ceo/api/breed/beagle/images/random'),
 function addNumbers(x, y){
 	return new Promise(function(resolve, reject){
 		let sum = x + y;
-		if (typeof sum === 'number') {
-			return console.log("The answer is " + sum);
+		// if (typeof sum === 'number') {
+		if ( !isNaN(x) && !isNaN(y) ) {
+			resolve(x + y);
 		} else {
-			return console.log("Not a number");
+			reject("Make sure to input 2 numbers");
 		}
 	});
 
-};
+}
 
-addNumbers(2, 2);
+addNumbers(2, 2)
+	.then(function(data){
+		console.log(data);
+	}).catch(function(error){
+		console.log(error);
+	});
 
 
 
@@ -92,6 +100,21 @@ dropButteredToastOnFloor(()=>{
 // and use the dropButteredToastOnFloor() function to call either resolve() or reject(). 
 // If done correctly, you should be able to run:
 
+
+function dropToastPromisified(){
+	return new Promise(function(resolve, reject){
+		dropButteredToastOnFloor(function(){
+			resolve()
+		}, function(){
+			reject()
+		});
+	});
+
+};
+
+
+
+
 dropToastPromisified()
    .then(()=>{
       alert('Whew, that was close!');
@@ -99,13 +122,16 @@ dropToastPromisified()
       alert('Well shucks, there goes my toast...');
    });
 
+   // or
 
-function dropToastPromisified(){
-	return new Promise(function(resolve, reject){
-		
-	});
+   dropToastPromisified().then(function(){
+   		console.log('Hooray')
+   }).catch(function(){
+   		console.log('boo')
+   });
 
-};
+
+
 
 
 
